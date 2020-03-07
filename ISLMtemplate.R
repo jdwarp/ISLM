@@ -1,4 +1,4 @@
-# ISLM model
+# ISLM model, Keynesian stuff
 
 
 # data are quarterly, Jan 2017 to Oct 2019
@@ -111,19 +111,34 @@ MoverP = M1/pIndex # constant $ money supply Gross $$ supply divided by
 #    If these are difference from the present levels,  
 #    what does this model suggest about the US economy?
 #
-# 2. Policy- the AVD19 virus will likely reduce GDP by 1 or 2 % and
+# 2. Policy- the COVD19 virus will likely reduce GDP by 1 or 2 % and
 #    change Nx by about 5% (we import less).  Given this,
 #    What policy measures do the IS-LM model suggest as a way to
-#    increase GDP?   
+#    increase GDP?    
 
 #  FUNCTIONS --------------------------------------------------
 # consumption function
 # consumption is a function of income, Y
 
-consumpFcn=glm(Consum~(Y-Taxes)) # Y-Taxes is disosable income
+consumpFcn=glm(Consum~(Y-Taxes)) # Y-Taxes is disposable income
 summary(consumpFcn)
 #get the coefficients for later use
 C0 = as.numeric(consumpFcn$coefficients[1])
 b = as.numeric(consumpFcn$coefficients[2])
 
 summary(consumpFcn)
+
+investFcn = glm(Invest ~ Y + interestRate)
+summary(investFcn)
+I0 = investFcn$coefficients[1]
+dY = investFcn$coefficients[2]
+dInt = investFcn$coefficients[3]
+
+moneyFcn = glm(MoverP ~ Y + interestRate)
+summary(moneyFcn)
+M0 = moneyFcn$coefficients[1]
+m1 =moneyFcn$coefficients[2]
+m2 = moneyFcn$coefficients[3]
+
+  
+IS_Y = glm()
