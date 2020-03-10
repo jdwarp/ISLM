@@ -101,10 +101,8 @@ Get price index, M/P, set interestRate
 pIndex = ISLMdata$CPI/ISLMdata$CPI[1] # normalize CPI
 MoverP = ISLMdata$M1/pIndex
 ISLMdata$'MoverP'= MoverP
-attach(ISLMdata)
 
-MPC = Consum/Y  # marginal propensity to consume, quarterly
-interestRate = libor
+interestRate = ISLMdata$libor
  # constant $ money supply Gross $$ divided by P
 
 attach(ISLMdata)
@@ -294,29 +292,4 @@ Do these recommedations seem reasonable?
 
 ## Conclusions:
 <!-- write up conclusions here -->
-
-
-equilibrium plot  Here is a solution to Gov't policy
-```{r}
-
-plot(Y, IS_Y(C0, b, I0, dY, dInt, interestRate, 2000, 5300, -450) , 
-     ylab = 'predicted Y', type='l')
-abline(0,1, col='red')
-
-# find equilibrium value
-yLow=Y[1]
-yHigh=Y[12]
-yTry = (yLow+yHigh)/2
-
-```
-
-## using LM
-
-```{r}
-plot(interestRate, IS_Y(C0, b, I0, dY, dInt, interestRate, Taxes, G_spend, Nx), type='l', ylab = 'GDP', xlab = 'interestRate', ylim=c(21000,30000))
-MoverP = 3350
-lines(interestRate, LM_Y(MoverP,interestRate,M0,m1,m2), col='red')
-grid()
-legend('topleft', c('IS Y', 'LM Y'),lty=1, col=c(1,2))
-```
 
