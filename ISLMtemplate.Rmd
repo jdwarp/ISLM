@@ -116,22 +116,22 @@ attach(ISLMdata)
    
 ### IS - investment saving..  
   Y = C + I + G - Nx   macro economic description  
-      C = C0 + b*(Y-T) # T is taxes  
-      I = I0 + dY * Y + dInt * interest  
+      C = C0 + b $\times$ Taxes    
+      I = I0 + dY $\times$ Y + dInt $\times$ interest  
       G, Nx are exogenous  
 
 
 ###  LM - liquidity preference for money
-  M/P = M0 + m1 * Y + m2 * interest     
+  M/P = M0 + m1 $\times$ Y + m2 $\times$ interest     
 
 ### IS curve: 
- Y = (C0 + b*(Y-Tax) + I0 + dY*Y +dInt*interest + G + Nx )
+ Y = (C0 + b $\times$ (Y-Tax) + I0 + dY $\times$ Y +dInt $\times$ interest + G - Nx )
  write two IS functions:  
  IS_Y, solve for y in the IS equation  
  IS_i, solve for interest in the IS equation  
 
 ### LM curve:  
- write two LM functions:  
+ write two LM functions:    
  LM_Y, solve for Y in the M/P equation  
  LM_i, solve for i in the M/P equation  
 
@@ -158,13 +158,17 @@ what does this model suggest about the US economy?
  consumption is a function of disposable income, (Y - tax) 
 
 ```{r}
-
-consumpFcn=glm(Consum~(Y-Taxes)) # Y-Taxes is disposable income
+disposableY = Y-Taxes
+consumpFcn=glm(Consum ~ disposableY) # Y-Taxes is disposable income
 summary(consumpFcn)
 #get the coefficients for later use
 C0 = as.numeric(consumpFcn$coefficients[1])
 b = as.numeric(consumpFcn$coefficients[2])
 
+consumption=function(Y, Taxes, C0, b){
+  disposableY = Y-Taxes
+  return(C0+b*disposableY)
+}
 ```
 
 ## investment function
@@ -172,9 +176,13 @@ b = as.numeric(consumpFcn$coefficients[2])
 
 investFcn = glm(Invest ~ Y + interestRate)
 summary(investFcn)
-I0 = investFcn$coefficients[1]
-dY = investFcn$coefficients[2]
-dInt = investFcn$coefficients[3]
+I0 = as.numeric(investFcn$coefficients[1])
+dY = as.numeric(investFcn$coefficients[2])
+dInt = as.numeric(investFcn$coefficients[3])
+
+investment = function(Y, interestRate){
+  return(I0 + dY*Y +dInt*interestRate)
+}
 ```
 
 ## demand for money function
@@ -185,51 +193,52 @@ M0 = moneyFcn$coefficients[1]
 m1 = moneyFcn$coefficients[2]
 m2 = moneyFcn$coefficients[3]
 ```
+## set macro targets
+```{r}
+FE_Y = 21700
+tax = 3990
+
+#exogenous
+netX = -350
+```
+
+
   
 ## IS -
 Innvestment/saving  formula from in class
 
-Y from IS
+Y from IS equation
 ```{r}
 
-IS_Y = function(C0, b, I0, dY, dInt, intRate, Tax, G, Nx){
+IS_Y = function(C0, b, I0, dY, dInt, intRate, tax, G, Nx){
   # C0, b:  coefficients from consumption function
   # I0, dY, dInt: coefficients from investment function
   # intRate:  interest rate
   # Tax, G, Nx: government spending, net exports, exogenous
-  Y = (C0-b*Tax + +I0 + dInt*intRate + G + Nx)/(1-dY-b)
+  Y = (C0-b*tax  + I0 + dInt*intRate + G - Nx)/(1-dY-b)
   return(Y)
 }
 
-# at each level of Y, plot predicted Y
-plot(Y,IS_Y(C0, b, I0, dY, dInt, interestRate, Taxes, G_spend, Nx),
-     ylab='predicted GDP', xlab='GDP', type='l')
-grid()
 ```
 
-
-interestRate from IS  
 ```{r}
-IS_i =function(Y, C0, b, Tax, I0, dY,dInt, G, Nx){
-  intR = (Y*(1-b)-C0+b*Tax-I0-dY-G_spend-Nx)/dInt
+
+IS_i = function(Y, C, I0, dY, dInt, G, Nx){
+  intR = (Y -C -I0 -dY*Y-G +Nx)/dInt
   return(intR)
 }
-
-IS_i(23500, C0, b, Taxes, I0, dY, dInt,5300, -450 )
-
 ```
-LM
-interest rate from LM  
 
 ```{r}
+
 LM_i = function(MoverP,Y, M0, m1, m2){
   intR = (MoverP - M0 - m1*Y)/m2
   return(intR)
 }
-
-LM_i(MoverP,Y, M0, m1, m2)
 ```
 
+
+## LM
 GDP from LM
 ```{r}
 LM_Y = function(MoverP,intR, M0, m1, m2){
@@ -237,6 +246,55 @@ LM_Y = function(MoverP,intR, M0, m1, m2){
   return(Y)
 }
 ```
+
+1. find values of Tax and g_sPend the result in interestRate  around 
+1% Using IS
+
+IS  
+```{r}
+
+#Macro economic targets
+Y_FE = 21700
+netX =-400
+intR = 1.0
+
+#Fiscal policy--  change these
+Tax = 2000
+g_Spend = 3400
+
+#Monetary policy
+mOp = 3950 # money supply
+
+C = consumption(Y_FE, Tax, C0, b)
+print(paste('consumption: ',C))
+
+I = investment(Y_FE, intR)
+print(paste('investment: ',I))
+
+equilibIntRate = IS_i(Y_FE, C, I0, dY, dInt , g_Spend, netX)
+print(paste('equilib interest: ',round(equilibIntRate,2)))
+
+
+```
+
+2. using interest rate from IS above,   
+change mOp to match intR
+
+```{r}
+# Monetary policy set money supply
+mOp = 3800
+
+LM_i(mOp,Y_FE, M0, m1, m2)
+```
+
+Write up your results; given the likely effects of COVOD19, what Econ
+policy recommendations are made by the ISLM model?
+
+Do these recommedations seem reasonable?
+
+## Conclusions:
+<!-- write up conclusions here -->
+
 
 equilibrium plot  Here is a solution to Gov't policy
 ```{r}
