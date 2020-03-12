@@ -270,11 +270,11 @@ netX =-450
 intR = 1.0
 #------------------------------------------
 
-#Fiscal policy--  find values for these
+#Fiscal policy--  YOU adjust these
 Tax = 2000
 g_Spend = 7500
 
-#Monetary policy
+#Monetary policy--  YOU set this
 mOp = 3950 # money supply
 
 #-------------------------------------------------------
@@ -295,10 +295,10 @@ plot(Y, equilibriumY, type='l',main='FRED data 2017-2019')
 grid()
 
 GDP = C + I + g_Spend - netX
-print(paste('national income accounting GDP: ', GDP))
+print(paste('national income accounting GDP: $', round(GDP)))
 ```
 
-### 2. using interest rate from IS above, find mOp to match intR
+### 2. using interest rate from IS above, find mOp to match intR.  Keep GDP around $21700B
 
 ```{r}
 # Monetary policy set money supply
