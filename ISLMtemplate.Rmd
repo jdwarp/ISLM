@@ -1,5 +1,5 @@
 ---
-title: "ISLM"
+title: "IS-LM"
 author: "Dr. J"
 date: "3/8/2020"
 output: html_document
@@ -9,11 +9,15 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# ISLM model, Simplified Keynesian  
+# IS-LM model, Simplified Keynesian 
+Data Analytics MGMT 6550
 
  Data are quarterly, Jan 2017 to Oct 2019  
  all dollar amounts are billions  
  all data from 'FRED' Federal Reserve bank St. Louis  
+ 
+Actual data from the past 3 years.  Can this provide insight into
+economic policy?  Specifically the COVID19 virus will have exogenous effects on the US economy, what policies (fiscal/monetary) would serve to minimize the effect of decreased production and trade?
  
 ## set up data 
 
@@ -91,26 +95,29 @@ ISLMdata = data.frame(
              3481.088, 3424.653, 3416.18,  3363.567 )
 )
 
-
 ```
 
 Get price index, M/P, set interestRate  
 
-```{r}
+```{r attachISLM}
 
 pIndex = ISLMdata$CPI/ISLMdata$CPI[1] # normalize CPI
-MoverP = ISLMdata$M1/pIndex
+
+# constant $ money supply Gross $$ divided by P
+MoverP = ISLMdata$M1/pIndex 
+
 ISLMdata$'MoverP'= MoverP
 
 interestRate = ISLMdata$libor
- # constant $ money supply Gross $$ divided by P
 
 attach(ISLMdata)
 
 ```
 
 ## Equations:  
-   descriptions:    
+   descriptions: Economic goals  
+   Full Employment GDP is estimated to be $21700B
+   interest rate aroud 1%
    
 ### IS - investment saving..  
   Y = C + I + G - Nx   macro economic description  
@@ -123,7 +130,7 @@ attach(ISLMdata)
   M/P = M0 + m1 $\times$ Y + m2 $\times$ interest     
 
 ### IS curve: 
- Y = (C0 + b $\times$ (Y-Tax) + I0 + dY $\times$ Y +dInt $\times$ interest + G - Nx )
+ Y = (C0 + b $\times$ (Y-Tax) + I0 + dY $\times$ Y +dInt $\times$ interest + G - Nx )  
  write two IS functions:  
  IS_Y, solve for y in the IS equation  
  IS_i, solve for interest in the IS equation  
@@ -143,12 +150,10 @@ For this exercise assume Full Employment GDP is $21700B, and Nx = -500
    b.  If these are difference from the present levels, for example if predicted GDP exceeds full employment GDP or interest rate is negative,  
 what does this model suggest about the US economy?
 
-   c.  Find values for Tax, G_spend, interest rate, M/P that yield GDP
-
  2. Policy- the COVID19 virus will likely reduce GDP  by 1 or 2 % and
-    change Nx by about 5% (we import less).  Given this,
+    change Nx by about 5%-10% (we import less).  Given this,
     What policy measures does the IS-LM model suggest as a way to
-    increase GDP?    
+    maintain GDP?    
 
 ##  FUNCTIONS -------------------------------------------------- 
 
@@ -167,6 +172,10 @@ consumption=function(Y, Taxes, C0, b){
   disposableY = Y-Taxes
   return(C0+b*disposableY)
 }
+
+plot(Y, consumption(Y, Taxes, C0, b), ylab='Consumption', type  = 'l',main='FRED data 2017-2019')
+points(Y,Consum, pch='x')
+grid()
 ```
 
 ## investment function
@@ -181,6 +190,10 @@ dInt = as.numeric(investFcn$coefficients[3])
 investment = function(Y, interestRate){
   return(I0 + dY*Y +dInt*interestRate)
 }
+
+plot(Y, investment(Y, interestRate), type='l',main='FRED data 2017-2019', ylab = 'Investment')
+points(Y,Invest, pch='x')
+grid()
 ```
 
 ## demand for money function
@@ -190,17 +203,16 @@ summary(moneyFcn)
 M0 = moneyFcn$coefficients[1]
 m1 = moneyFcn$coefficients[2]
 m2 = moneyFcn$coefficients[3]
+
+demandM = function(Y, Int_R, M0, m1, m2){
+  return( M0 + m1*Y + m2*Int_R)
+}
+
+plot(Y, demandM(Y, interestRate, M0, m1, m2), type='l', ylab = 'demand for $', main='FRED data 2017-2019')
+points(Y, MoverP, pch='x')
+grid()
+
 ```
-## set macro targets
-```{r}
-FE_Y = 21700
-tax = 3990
-
-#exogenous
-netX = -350
-```
-
-
   
 ## IS -
 Innvestment/saving  formula from in class
@@ -227,16 +239,19 @@ IS_i = function(Y, C, I0, dY, dInt, G, Nx){
 }
 ```
 
+
+## LM
+interest from LM
+
 ```{r}
 
 LM_i = function(MoverP,Y, M0, m1, m2){
   intR = (MoverP - M0 - m1*Y)/m2
-  return(intR)
+  return(as.numeric(intR))
 }
 ```
 
 
-## LM
 GDP from LM
 ```{r}
 LM_Y = function(MoverP,intR, M0, m1, m2){
@@ -245,23 +260,24 @@ LM_Y = function(MoverP,intR, M0, m1, m2){
 }
 ```
 
-1. find values of Tax and g_sPend the result in interestRate  around 
-1% Using IS
+### 1. find values of Tax and g_sPend the result in interestRate  around 1% Using IS
 
-IS  
-```{r}
+```{r targets}
 
-#Macro economic targets
-Y_FE = 21700
-netX =-400
+#Macro economic targets these are fixed----
+Y_FE = 21700 #Full Employment GDP
+netX =-450
 intR = 1.0
+#------------------------------------------
 
-#Fiscal policy--  change these
+#Fiscal policy--  find values for these
 Tax = 2000
-g_Spend = 3400
+g_Spend = 7500
 
 #Monetary policy
 mOp = 3950 # money supply
+
+#-------------------------------------------------------
 
 C = consumption(Y_FE, Tax, C0, b)
 print(paste('consumption: ',C))
@@ -269,26 +285,36 @@ print(paste('consumption: ',C))
 I = investment(Y_FE, intR)
 print(paste('investment: ',I))
 
-equilibIntRate = IS_i(Y_FE, C, I0, dY, dInt , g_Spend, netX)
-print(paste('equilib interest: ',round(equilibIntRate,2)))
+equilibIntRate=LM_i(mOp,Y, M0, m1, m2)
+plot(Y,equilibIntRate, ylab = 'LM interest', type='l',main='FRED data 2017-2019')
+grid()
 
 
+equilibriumY = IS_Y( C0, b, I0, dY, dInt, equilibIntRate, Tax, g_Spend, netX)
+plot(Y, equilibriumY, type='l',main='FRED data 2017-2019')
+grid()
+
+GDP = C + I + g_Spend - netX
+print(paste('national income accounting GDP: ', GDP))
 ```
 
-2. using interest rate from IS above,   
-change mOp to match intR
+### 2. using interest rate from IS above, find mOp to match intR
 
 ```{r}
 # Monetary policy set money supply
-mOp = 3800
 
 LM_i(mOp,Y_FE, M0, m1, m2)
 ```
 
 Write up your results; given the likely effects of COVOD19, what Econ
-policy recommendations are made by the ISLM model?
+policy recommendations are made by the IS-LM model?
 
-Do these recommedations seem reasonable?
+Include your recommendations for:
+1. Federal taxes- tax cut, increase federal taxes, of leave at curreint level?  What is the dollar amound of taxes that best serves to make predicted GDP around $21700B
+2. Money supply: what level makes the most sense to maintain interest around 1%?
+3. Government spending: should government spending be increased, decreased or left at current levels?   What dollar amount do you recommend for government spending
+
+Do your recommedations seem reasonable, given this is an election year?
 
 ## Conclusions:
 <!-- write up conclusions here -->

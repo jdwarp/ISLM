@@ -4,12 +4,6 @@ author: "Dr. J"
 date: "3/10/2020"
 output: html_document
 ---
----
-title: "ISLM"
-author: "Your Name Here"
-date: "03/2020"
-output: html_document
----
  
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -139,13 +133,10 @@ interestRate = libor
 ## Quesions:
 For this exercise assume Full Employment GDP is $21700B, and Nx = -500
 
- 1. Given the last values of the variables, (estimates of current US       macroeconomic values), what is the equilibrium level of GDP predicted by IS_Y?
+ 1. Given the last values of the variables, (estimates of current US       macroeconomic values), what is the equilibrium level of GDP predicted by IS_Y?  What does this GDP suggest about possible recession?
  
 
- 2. Policy- the COVID19 virus will likely reduce GDP  by 1 or 2 % and
-    change Nx by about 5% or more (we import less).  Given this,
-    What policy measures does the IS-LM model suggest as a way to
-    increase GDP?    
+ 2. Policy- the COVID19 virus will likely reduce GDP  by 1 or 2 % and     change Nx by about 5% or more (we import less).  Given this, What policy measures does the IS-LM model suggest as guidelines to maintain full-employment GDP?    
 
 ##  FUNCTIONS -------------------------------------------------- 
 
@@ -282,7 +273,7 @@ print(paste('equilibrium Y = ',equilibriumY ))
 ```
 
 
-Write up your results; given the likely effects of COVOD19, what Econ
+Write up your results; given the likely effects of COVID19, what Econ
 policy recommendations may be inferred from the ISLM model?
 
 Do these recommedations seem reasonable?
