@@ -12,8 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 # ISLM model, Simplified Keynesian  
 
  Data are quarterly, Jan 2017 to Oct 2019  
- all dollar amounts are billions  
- all data from 'FRED' Federal Reserve bank St. Louis  
+ All dollar amounts are $billions  
+ All data from 'FRED' Federal Reserve bank St. Louis  
  
 ## set up data 
 
@@ -131,6 +131,7 @@ interestRate = libor
  LM_i, solve for i in the M/P equation  
 
 ## Quesions:
+
 For this exercise assume Full Employment GDP is $21700B, and Nx = -500
 
  1. Given the last values of the variables, (estimates of current US       macroeconomic values), what is the equilibrium level of GDP predicted by IS_Y?  What does this GDP suggest about possible recession?
@@ -216,6 +217,8 @@ LM_i = function(MoverP,Y, M0, m1, m2){
 }
 ```
 
+### Question # 1:  
+use function LM_Y and last values from the data set to estimate equilibrium value of Y
 
 GDP from LM
 ```{r}
@@ -225,8 +228,9 @@ LM_Y = function(MoverP,intR, M0, m1, m2){
 }
 ```
 
-2a. find values of Tax and g_Spend the result in interestRate  around 
-1% Using IS
+### Question # 2a: 
+find values of Tax and g_Spend the result in interestRate close to 
+1% Using IS_i
 
 IS  
 ```{r}
@@ -254,7 +258,8 @@ print(paste('equilib interest: ',round(equilibIntRate,2)))
 
 ```
 
-2b. Using interest rate from IS above, find money supply (mOp) to match equilibIntRate
+### Question 2b:   
+Using interest rate from IS above, find money supply (mOp) to match equilibIntRate
 
 ```{r}
 # Monetary policy set money supply
@@ -266,11 +271,6 @@ LM_i(mOp,Y_FE, M0, m1, m2)
 ```
 <!-- negative interest rates are not OK; need a value near 1% -->
 
-At these values the equilibrium GDP is ...
-```{r}
-equilibriumY = IS_Y(C0, b, I0, dY, dInt, equilibIntRate, Tax, g_Spend, netX) 
-print(paste('equilibrium Y = ',equilibriumY ))
-```
 
 
 Write up your results; given the likely effects of COVID19, what Econ
@@ -279,6 +279,7 @@ policy recommendations may be inferred from the ISLM model?
 Do these recommedations seem reasonable?
 
 ## Conclusions:
+### Summarize your findings
 <!-- write up conclusions here -->
 
 
