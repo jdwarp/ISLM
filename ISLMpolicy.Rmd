@@ -243,8 +243,8 @@ netX =-490 # Estimate decrease in net exports, can change a bit
 intR = 1.0 # current rate is around 1%
 
 #Fiscal policy--  change these to get an idea of gov't fiscal policy
-Tax = 2010  # tax cut??
-g_Spend = 7600  # increase government spending? usually happens in an 
+Tax = 3000  # tax cut??
+g_Spend = 6600  # increase government spending? usually happens in an 
                 #  election year
 
 C = consumption(Y_FE, Tax, C0, b)
@@ -256,6 +256,7 @@ print(paste('investment: ',round(I,2)))
 equilibIntRate = IS_i(Y_FE, C, I0, dY, dInt , g_Spend, netX)
 print(paste('equilib interest: ',round(equilibIntRate,2)))
 
+
 ```
 
 ### Question 2b:   
@@ -265,12 +266,23 @@ Using interest rate from IS above, find money supply (mOp) to match equilibIntRa
 # Monetary policy set money supply
 #Monetary policy change his to change equilibrium interest; This plays a
 # role in the LM equation
-mOp = 4950 # money supply
+mOp = 3580# money supply
 
-LM_i(mOp,Y_FE, M0, m1, m2)
+predInt = LM_i(mOp,Y_FE, M0, m1, m2)
+print(paste('predicted interest = ', round(predInt,3)))
 ```
 <!-- negative interest rates are not OK; need a value near 1% -->
 
+```{r}
+Tax = 2190
+print(paste('Tax = ', Tax))
+g_Spend = 5500
+print(paste('g_Spend = ', g_Spend))
+
+Ypred = IS_Y(C0, b, I0, dY, dInt, predInt, Tax, g_Spend, netX)
+print(paste('pred Y = ',Ypred))
+print(paste('Full Employmente GDP = ',round(Y_FE,2)))
+```
 
 
 Write up your results; given the likely effects of COVID19, what Econ
