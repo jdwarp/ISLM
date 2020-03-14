@@ -372,8 +372,8 @@ summary {
 <div id="islm-model-simplified-keynesian" class="section level1">
 <h1>ISLM model, Simplified Keynesian</h1>
 <p>Data are quarterly, Jan 2017 to Oct 2019<br />
-all dollar amounts are billions<br />
-all data from ‘FRED’ Federal Reserve bank St. Louis</p>
+All dollar amounts are $billions<br />
+All data from ‘FRED’ Federal Reserve bank St. Louis</p>
 <div id="set-up-data" class="section level2">
 <h2>set up data</h2>
 <pre class="r"><code>ISLMdata = data.frame(
@@ -489,8 +489,8 @@ LM_i, solve for i in the M/P equation</p>
 <h2>Quesions:</h2>
 <p>For this exercise assume Full Employment GDP is $21700B, and Nx = -500</p>
 <ol style="list-style-type: decimal">
-<li><p>Given the last values of the variables, (estimates of current US macroeconomic values), what is the equilibrium level of GDP predicted by IS_Y?</p></li>
-<li><p>Policy- the COVID19 virus will likely reduce GDP by 1 or 2 % and change Nx by about 5% or more (we import less). Given this, What policy measures does the IS-LM model suggest as a way to increase GDP?</p></li>
+<li><p>Given the last values of the variables, (estimates of current US macroeconomic values), what is the equilibrium level of GDP predicted by IS_Y? What does this GDP suggest about possible recession?</p></li>
+<li><p>Policy- the COVID19 virus will likely reduce GDP by 1 or 2 % and change Nx by about 5% or more (we import less). Given this, What policy measures does the IS-LM model suggest as guidelines to maintain full-employment GDP?</p></li>
 </ol>
 </div>
 <div id="functions" class="section level2">
@@ -623,12 +623,18 @@ m2 = moneyFcn$coefficients[3]</code></pre>
   intRate = (MoverP - M0 - m1*Y)/m2
   return(as.numeric(intRate))
 }</code></pre>
+<div id="question-1" class="section level3">
+<h3>Question # 1:</h3>
+<p>use function LM_Y and last values from the data set to estimate equilibrium value of Y</p>
 <p>GDP from LM</p>
 <pre class="r"><code>LM_Y = function(MoverP,intR, M0, m1, m2){
   Y = (MoverP-m2*intR)/m1
   return(Y)
 }</code></pre>
-<p>2a. find values of Tax and g_Spend the result in interestRate around 1% Using IS</p>
+</div>
+<div id="question-2a" class="section level3">
+<h3>Question # 2a:</h3>
+<p>find values of Tax and g_Spend the result in interestRate close to 1% Using IS_i</p>
 <p>IS</p>
 <pre class="r"><code>#Macro economic targets-  Use these or other values that make sense
 # for the US economy
@@ -638,38 +644,54 @@ netX =-490 # Estimate decrease in net exports, can change a bit
 intR = 1.0 # current rate is around 1%
 
 #Fiscal policy--  change these to get an idea of gov&#39;t fiscal policy
-Tax = 2010  # tax cut??
-g_Spend = 7600  # increase government spending? usually happens in an 
+Tax = 3000  # tax cut??
+g_Spend = 6600  # increase government spending? usually happens in an 
                 #  election year
 
 C = consumption(Y_FE, Tax, C0, b)
 print(paste(&#39;consumption: &#39;,round(C,2)))</code></pre>
-<pre><code>## [1] &quot;consumption:  14740.94&quot;</code></pre>
+<pre><code>## [1] &quot;consumption:  14084.35&quot;</code></pre>
 <pre class="r"><code>I = investment(Y_FE, intR)
 print(paste(&#39;investment: &#39;,round(I,2)))</code></pre>
 <pre><code>## [1] &quot;investment:  3240.87&quot;</code></pre>
 <pre class="r"><code>equilibIntRate = IS_i(Y_FE, C, I0, dY, dInt , g_Spend, netX)
 print(paste(&#39;equilib interest: &#39;,round(equilibIntRate,2)))</code></pre>
-<pre><code>## [1] &quot;equilib interest:  -27.65&quot;</code></pre>
-<p>2b. Using interest rate from IS above, find money supply (mOp) to match equilibIntRate</p>
+<pre><code>## [1] &quot;equilib interest:  -16.79&quot;</code></pre>
+</div>
+<div id="question-2b" class="section level3">
+<h3>Question 2b:</h3>
+<p>Using interest rate from IS above, find money supply (mOp) to match equilibIntRate</p>
 <pre class="r"><code># Monetary policy set money supply
 #Monetary policy change his to change equilibrium interest; This plays a
 # role in the LM equation
-mOp = 4950 # money supply
+mOp = 3580# money supply
 
-LM_i(mOp,Y_FE, M0, m1, m2)</code></pre>
-<pre><code>## [1] -16.35762</code></pre>
+predInt = LM_i(mOp,Y_FE, M0, m1, m2)
+print(paste(&#39;predicted interest = &#39;, round(predInt,3)))</code></pre>
+<pre><code>## [1] &quot;predicted interest =  3.997&quot;</code></pre>
 <!-- negative interest rates are not OK; need a value near 1% -->
-<p>At these values the equilibrium GDP is …</p>
-<pre class="r"><code>equilibriumY = IS_Y(C0, b, I0, dY, dInt, equilibIntRate, Tax, g_Spend, netX) 
-print(paste(&#39;equilibrium Y = &#39;,equilibriumY ))</code></pre>
-<pre><code>## [1] &quot;equilibrium Y =  21700&quot;</code></pre>
-<p>Write up your results; given the likely effects of COVOD19, what Econ policy recommendations may be inferred from the ISLM model?</p>
+<pre class="r"><code>Tax = 2190
+print(paste(&#39;Tax = &#39;, Tax))</code></pre>
+<pre><code>## [1] &quot;Tax =  2190&quot;</code></pre>
+<pre class="r"><code>g_Spend = 5500
+print(paste(&#39;g_Spend = &#39;, g_Spend))</code></pre>
+<pre><code>## [1] &quot;g_Spend =  5500&quot;</code></pre>
+<pre class="r"><code>Ypred = IS_Y(C0, b, I0, dY, dInt, predInt, Tax, g_Spend, netX)
+print(paste(&#39;pred Y = &#39;,Ypred))</code></pre>
+<pre><code>## [1] &quot;pred Y =  30167.9271511794&quot;</code></pre>
+<pre class="r"><code>print(paste(&#39;Full Employment GDP = &#39;,round(Y_FE,2)))</code></pre>
+<pre><code>## [1] &quot;Full Employment GDP =  21700&quot;</code></pre>
+<p>Write up your results; given the likely effects of COVID19, what Econ policy recommendations may be inferred from the ISLM model?</p>
 <p>Do these recommedations seem reasonable?</p>
+</div>
 </div>
 <div id="conclusions" class="section level2">
 <h2>Conclusions:</h2>
+<div id="summarize-your-findings" class="section level3">
+<h3>Summarize your findings</h3>
 <!-- write up conclusions here -->
+<p>The Keynes simplified model implies that:</p>
+</div>
 </div>
 </div>
 

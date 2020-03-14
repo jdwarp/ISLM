@@ -281,7 +281,7 @@ print(paste('g_Spend = ', g_Spend))
 
 Ypred = IS_Y(C0, b, I0, dY, dInt, predInt, Tax, g_Spend, netX)
 print(paste('pred Y = ',Ypred))
-print(paste('Full Employmente GDP = ',round(Y_FE,2)))
+print(paste('Full Employment GDP = ',round(Y_FE,2)))
 ```
 
 
@@ -294,4 +294,5 @@ Do these recommedations seem reasonable?
 ### Summarize your findings
 <!-- write up conclusions here -->
 
+The Keynes simplified model implies that:
 
