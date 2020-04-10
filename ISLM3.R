@@ -206,7 +206,8 @@ Consmp0 = -280
 lines(yPlot, IS_i(Consmp0, b, yPlot, tax, Invest0, dy, dInt, gSpend, Nxport),
       type='l', col='grey')
 
-lines(yPlot, LM_i(MoverPfixed, yPlot,M0, d1, d2), 
+MoP = MoverP[lastN]
+lines(yPlot, LM_i(MoP, yPlot,M0, d1, d2), 
      ylab=c('yModel'), xlab = 'Y', type='l', col='green')
 abline(v=22000, lty=2, col='red')
 legend('left', c('IS','LM','Full E'),
