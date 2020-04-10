@@ -42,7 +42,7 @@ ISLMdata = data.frame(
                 M1 = c(3405.462, 3498.1, 3570.162, 3613.338,
                        3639.485, 3658.723, 3688.038, 3719.443, 
                        3743.892, 3796.215, 3867.964, 3950.738,
-                       4000.00, 41000.00),
+                       4000.00, 4100.00),
 
 # M2 money supply  M1 + easily convertible               
                 M2 = c(13332.092, 13515.838, 13659.854,
@@ -190,14 +190,22 @@ intRplot = seq(from=-12, to=4, by= 0.2)
 lastN = length(G_spend)
 gSpend = G_spend[lastN]
 
+
+
 Nxport = Nx[lastN]
-MoverPfixed = MoverP[lastN]
 tax = Taxes[lastN]
-
-
-
-plot(yPlot, IS_i(C0, b, yPlot, tax, I0, dy, dInt, gSpend, Nxport),
+Invest0 = I0
+Consmp0 = C0
+plot(yPlot, IS_i(Consmp0, b, yPlot, tax, Invest0, dy, dInt, gSpend, Nxport),
      type='l', ylab = 'interest rate', ylim=c(-12, 5))
+
+Nxport = -500
+Invest0=500 # fixed investment
+Consmp0 = -280
+
+lines(yPlot, IS_i(Consmp0, b, yPlot, tax, Invest0, dy, dInt, gSpend, Nxport),
+      type='l', col='grey')
+
 lines(yPlot, LM_i(MoverPfixed, yPlot,M0, d1, d2), 
      ylab=c('yModel'), xlab = 'Y', type='l', col='green')
 abline(v=22000, lty=2, col='red')
@@ -206,10 +214,24 @@ legend('left', c('IS','LM','Full E'),
 grid()
 
 
-plot(intRplot, LM_Y(MoverPfixed,intRplot, M0, d1, d2)/1.e3,
+##  
+
+MoP = MoverP[lastN]
+plot(intRplot, LM_Y(MoP,intRplot, M0, d1, d2)/1.e3,
      ylab = 'GDP, T$', type='l',col='black', ylim=c(20,40))
-lines(intRplot, IS_Y(C0, b, tax, I0, dy, dInt, intRplot,
+
+MoP = 4500
+lines(intRplot, LM_Y(MoP,intRplot, M0, d1, d2)/1.e3,
+      ylab = 'GDP, T$', type='l',col='grey')
+
+
+tX = Taxes[lastN]
+lines(intRplot, IS_Y(C0, b, tX, I0, dy, dInt, intRplot,
           gSpend, Nxport)/1.e3, col='green')
+tX = 7000
+lines(intRplot, IS_Y(C0, b, tX, I0, dy, dInt, intRplot,
+                     gSpend, Nxport)/1.e3, col='grey')
+
 abline(h=22000/1.e3, lty=2, col='red')
 legend('topleft',c('LM', 'IS', 'Full E'), 
        col=c('black','green','red'), lty=c(1,1,2))
