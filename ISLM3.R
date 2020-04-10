@@ -6,72 +6,91 @@
 # all data from 'FRED' Federal Reserve bank St. Louis
 #  Data are quarterly from Jan 2017 to Oct 2019
 
+# GDP due to Corona Virus, COVID19, now projected to be a
+# contraction of between 8 and 15%.  Assume 12% contraction
+
+# modify first Q of 2020 to reflect this, then pursue
+# policy
+
 ISLMdata = data.frame(
   
 # consumpton  
             Consum = c(13104.43, 13212.5, 13345.07,
                       13586.27, 13728.33, 13939.83,
                       14114.53, 14211.9, 14266.27,
-                      14511.17, 14678.2, 14789.27),
+                      14511.17, 14678.2, 14789.27,
+                      13024.00, 12500.0),
                 
 # GDP, aggregate demand                
                 Y = c(19190.431, 19356.649, 19611.704, 19918.91,
                       20163.159, 20510.177, 20749.752, 20897.804,
-                      21098.827, 21340.267, 21542.54,  21726.779),
+                      21098.827, 21340.267, 21542.54,  21726.779,
+                      19100.00, 18700.0),
 
 # Government spending                
                 G_spend = c(6526.927, 6525.904, 6623.281, 6713.611,
                             6806.73, 6901.58, 6971.018, 7042.209,
-                            7149.65, 7292.506, 7359.535, 7424.398),
+                            7149.65, 7292.506, 7359.535, 7424.398,
+                            9500.00, 9600.99),
 # Gross domestic savings                
           personalSavings = c(3600.665, 3613.782, 3658.564, 3632.806,
                             3826.156, 3753.84, 3814.944, 3785.88,
-                            3909.787, 3866.799, 3826.739, 3840.0),
+                            3909.787, 3866.799, 3826.739, 3840.0,
+                            3072.00, 2900.0),
 
 # M1 money supply, cash and checking deposits              
                 M1 = c(3405.462, 3498.1, 3570.162, 3613.338,
                        3639.485, 3658.723, 3688.038, 3719.443, 
-                       3743.892, 3796.215, 3867.964, 3950.738),
+                       3743.892, 3796.215, 3867.964, 3950.738,
+                       4000.00, 41000.00),
 
 # M2 money supply  M1 + easily convertible               
                 M2 = c(13332.092, 13515.838, 13659.854,
                        13794.4, 13892.846, 14045.685,
                        14186.1, 14275.914, 14464.792,
-                       14645.462, 14932.307, 15243.2),
+                       14645.462, 14932.307, 15243.2,
+                       13000.00, 12500.00),
 
 # Government revenue                
                 Taxes = c(1987.626, 2003.74, 2042.913, 2042.372,
                          1921.492, 1943.529, 1971.38, 1987.923,
-                         2018.649, 2027.559, 2028.389, 2030.0 ),
+                         2018.649, 2027.559, 2028.389, 2030.0,
+                         1725.0, 1700.00),
 
 
 # velocity of money; how many times $ changes hands/yr              
                 Vel_M1 = c(5.623, 5.529, 5.493, 5.513, 5.534,
                            5.605, 5.625, 5.616, 5.636, 5.613,
-                           5.564, 5.5),
+                           5.564, 5.5,
+                           4.5, 4.4),
 
 # net exports $ value of exports - imports                
                 Nx = c(-570.922, -583.726, -550.586, -596.11,
                        -628.967, -568.391, -671.353, -684.148,
-                       -633.848, -662.66,  -653.032, -577.381),
+                       -633.848, -662.66,  -653.032, -577.381,
+                       -500.00, -475),
 
 # consumer price index                
                 CPI = c(243.822, 244.054, 245.359, 247.25,
                         249.235, 250.591, 251.883,
                         252.697, 253.275, 255.171,
-                        256.325, 257.832),
+                        256.325, 257.832,
+                        260.0, 255.0), #slight increase in CPI
 # interest rate, %                
                 Int_r = c(0.7,0.95, 1.153, 1.203, 1.446, 1.737,
-                        1.923, 2.22, 2.403, 2.397, 2.19, 1.643),
+                        1.923, 2.22, 2.403, 2.397, 2.19, 1.643,
+                        0.00, 0.00),
 # libor %
                 libor=c(0.830, 1.063, 1.232, 1.330, 1.653,
                         1.972, 2.107, 2.347, 2.498, 2.443,
-                        2.179, 1.791),
+                        2.179, 1.791,
+                        0.00, 0.00),
 
 # investment                
                 Invest = c(3140.293, 3167.926, 3225.247, 3262.117,
                            3311.826, 3296.571, 3404.226, 3429.477,
-                           3481.088, 3424.653, 3416.18,  3363.567 )
+                           3481.088, 3424.653, 3416.18,  3363.567,
+                           2700.00, 2650.00)
 )
 
 attach(ISLMdata)
@@ -135,7 +154,7 @@ I0 = as.numeric(investFcn$coefficients[1]) #fixed investment
 dY = as.numeric(investFcn$coefficients[2])
 dInt = as.numeric(investFcn$coefficients[3])
 
-MoneyFcn = glm(MoverP ~ Y + Int_rF)
+MoneyFcn = glm(MoverP ~ Y + interestRate)
 M0 = as.numeric(MoneyFcn$coefficients[1])
 d1 = as.numeric(MoneyFcn$coefficients[2])
 d2 = -as.numeric(MoneyFcn$coefficients[3])
@@ -165,60 +184,37 @@ LM_i = function(MoverP, Y, M0, d1, d2){
 }
 
 #----------------------------------------------------------
-yPlot=seq(from=10000, to=32000, by=500)
-intRplot = seq(from=0, to=0.5, by= 0.05)
+yPlot=seq(from=10000, to=36000, by=500)
+intRplot = seq(from=-12, to=4, by= 0.2)
+
+lastN = length(G_spend)
+gSpend = G_spend[lastN]
+
+Nxport = Nx[lastN]
+MoverPfixed = MoverP[lastN]
+tax = Taxes[lastN]
 
 
-gSpend = G_spend[12]
-Nxport = -550
-MoverPfixed = MoverP[12]
-tax = Taxes[12]/2
 
 plot(yPlot, IS_i(C0, b, yPlot, tax, I0, dy, dInt, gSpend, Nxport),
-     type='l', ylab = 'interest rate')
+     type='l', ylab = 'interest rate', ylim=c(-12, 5))
 lines(yPlot, LM_i(MoverPfixed, yPlot,M0, d1, d2), 
      ylab=c('yModel'), xlab = 'Y', type='l', col='green')
-legend('topleft', c('IS','LM'), lty=1,col=c('black','green'))
+abline(v=22000, lty=2, col='red')
+legend('left', c('IS','LM','Full E'),
+       col=c('black','green','red'), lty=c(1,1,3))
 grid()
 
-plot(intRplot, LM_Y(MoverPfixed,intRplot, M0, d1, d2),
-     ylab = 'GDP', type='l')
+
+plot(intRplot, LM_Y(MoverPfixed,intRplot, M0, d1, d2)/1.e3,
+     ylab = 'GDP, T$', type='l',col='black', ylim=c(20,40))
 lines(intRplot, IS_Y(C0, b, tax, I0, dy, dInt, intRplot,
-          gSpend, Nxport))
+          gSpend, Nxport)/1.e3, col='green')
+abline(h=22000/1.e3, lty=2, col='red')
+legend('topleft',c('LM', 'IS', 'Full E'), 
+       col=c('black','green','red'), lty=c(1,1,2))
+grid()
 
-#Y for various interest rates
-
-# find r for a given Y:
-
-rLow = 0.00001
-rHigh = 14.5
-#full employment GDP
-y_Target = 21500
-
-for (i in 1:20){
-  r = (rLow + rHigh)/2
-  print(r)
-  Yequ = LM_Y(MoverPfixed, r, M0, d1, d2)
-  if (abs(Yequ-y_Target) < 1) break
-  if (Yequ > y_Target) rLow = r
-  else rHigh=r
-}
-print(paste(i,' iterations, r = ', round(r,3)))
-
-# Assume r  = 0.25, what is equilibrium Y
-r = 0.025
-
-equilibY = LM_Y(MoverPfixed, r, M0, d1, d2)
-print(equilibY)
-
-# at this equilibY
-ISequilib = IS_Y(C0, b, tax, I0, dy, dInt, intRplot, gSpend, Nxport)
-
-# planned inflation:
-inflationGap= (ISequilib - y_Target)
-print(paste('inflationary gap: ',inflationGap))
-
-# current Y = 22000
 
 
 
