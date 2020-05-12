@@ -1,6 +1,13 @@
+---
+  title: "ISLM - Basic US Economic Model"
+author: "Jaime Duran"
+date: "5/11/2020"
+output: html_document
+---
+  
 # ISLM model
 
-
+ 
 # data are quarterly, Jan 2017 to Oct 2019
 # all $$ amounts are billions
 # all data from 'FRED' Federal Reserve bank St. Louis
@@ -122,11 +129,12 @@ MoverP = M1/pIndex # constant $ money supply Gross $$ divided by
 # LM_Y, solve for Y in the M/P equation
 # LM_i, solve for i in the M/P equation
 
-# Quesions:
+# Quesions & Answers:
 # 1. given the last values of the variables, what are the 
 #    equilibrium levels of interest rate, and GDP.   
 #    If these are difference from the present levels,  
 #    what does this model suggest about the US economy?
+
 #
 # 2. Policy- the COVID19 virus will likely reduce GDP by 1 or 2 %
 #    change Nx by about 5% (import less).  Given this,
@@ -238,8 +246,22 @@ legend('topleft',c('LM', 'IS', 'Full E'),
        col=c('black','green','red'), lty=c(1,1,2))
 grid()
 
-
-
-
+##Analysis and Conclusions
+#   The Interest Rate model predicts that if current economic trends continue regarding interest rate policy, 
+# there will be an oversupply of money. The grey line represents the predicted how the 
+# changing variables that encourage a decrease Investment Savings can buffer against
+# the effect of inflation. The goal is to modify the values that go into determining how
+# much money people are holding onto, and instead encourage consumption and spending. Even with
+# generous policy the grey line being beyond the red-dashed limit shows that there is more money in the
+# economy than the economy should be worth at a full equilibrium, which means that inflation is 
+# difficult to control, and will be up to 5 trillion dollarr worse. We seem headed towards
+# a interest rate which penalizes savings beteween -6%, or just -2% ifwe take action to roll back fixed investments.
+#   
+#   The second IS-LM model shows how the GDP total value decreases as the interest rate rises.
+# An interest rate without drastic change in taxation policy would seem to be stuck at less that -5%.
+# This would stall and hurt the economy. By taxing people who earn high income, or making them repay their 
+# economic stimulus in next years taxes, we could increase government revenue. This progressive taxation scheme
+# would produce an equilibrium represented by the grey lines. As the economy contracts,
+# increasing the money supply can become out of control inflation. 
 
 

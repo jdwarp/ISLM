@@ -1,0 +1,321 @@
+---
+title: "IS-LM"
+author: "Dr. J"
+date: "3/8/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# IS-LM model, Simplified Keynesian 
+Data Analytics MGMT 6550
+
+ Data are quarterly, Jan 2017 to Oct 2019  
+ all dollar amounts are billions  
+ all data from 'FRED' Federal Reserve bank St. Louis  
+ 
+Actual data from the past 3 years.  Can this provide insight into
+economic policy?  Specifically the COVID19 virus will have exogenous effects on the US economy, what policies (fiscal/monetary) would serve to minimize the effect of decreased production and trade?
+ 
+## set up data 
+
+```{r loadData}
+
+ISLMdata = data.frame(
+  
+  # consumpton  
+  Consum = c(13104.43333, 13212.5, 13345.06667,
+             13586.26667, 13728.33333, 13939.83333,
+             14114.53333, 14211.9, 14266.26667,
+             14511.16667, 14678.2, 14789.26667),
+  
+  # GDP, aggregate demand                
+  Y = c(19190.431, 19356.649, 19611.704, 19918.91,
+        20163.159, 20510.177, 20749.752, 20897.804,
+        21098.827, 21340.267, 21542.54,  21726.779),
+  
+  # Government spending                
+  G_spend = c(6526.927, 6525.904, 6623.281, 6713.611,
+              6806.73, 6901.58, 6971.018, 7042.209,
+              7149.65, 7292.506, 7359.535, 7424.398),
+  
+  # Gross domestic savings                
+  personalSavings = c(3600.665, 3613.782, 3658.564, 3632.806,
+                      3826.156, 3753.84, 3814.944, 3785.88,
+                      3909.787, 3866.799, 3826.739, 3840.0),
+  
+  # M1 money supply, cash and checking deposits              
+  M1 = c(3405.461538, 3498.1, 3570.161538, 3613.338462,
+         3639.484615, 3658.723077, 3688.038462,
+         3719.442857, 3743.891667, 3796.215385,
+         3867.964286, 3950.738462),
+  
+  # M2 money supply  M1 + easily convertible               
+  M2 = c(13332.09231, 13515.83846, 13659.85385,
+         13794.4, 13892.84615, 14045.68462,
+         14186.1, 14275.91429, 14464.79167,
+         14645.46154, 14932.30714, 15243.2),
+  
+  # Government revenue                
+  Taxes = c(1987.626, 2003.74, 2042.913, 2042.372,
+            1921.492, 1943.529, 1971.38, 1987.923,
+            2018.649, 2027.559, 2028.389, 2030.0 ),
+  
+  
+  # velocity of money; how many times $ changes hands                
+  Vel_M1 = c(5.623, 5.529, 5.493, 5.513, 5.534,
+             5.605, 5.625, 5.616, 5.636, 5.613,
+             5.564, 5.5),
+  
+  # net exports $ value of exports - imports                
+  Nx = c(-570.922, -583.726, -550.586, -596.11,
+         -628.967, -568.391, -671.353, -684.148,
+         -633.848, -662.66,  -653.032, -577.381),
+  
+  # consumer price index                
+  CPI = c(243.822, 244.0543333, 245.359, 247.25,
+          249.2346667, 250.591, 251.8826667,
+          252.6973333, 253.2753333, 255.1706667,
+          256.3246667, 257.8323333),
+  
+  # interest rate, %                
+  fedRate = c(0.7,0.95, 1.153, 1.203, 1.446, 1.737,
+              1.923, 2.22, 2.403, 2.397, 2.19, 1.643),
+  # libor %
+  libor=c(0.829557031, 1.06296541, 1.231578281,
+          1.330114127, 1.653367302, 1.971670645,
+          2.107461406, 2.34698, 2.49826381,
+          2.442525738, 2.178625385, 1.791037656 ),
+  
+  # investment                
+  Invest = c(3140.293, 3167.926, 3225.247, 3262.117,
+             3311.826, 3296.571, 3404.226, 3429.477,
+             3481.088, 3424.653, 3416.18,  3363.567 )
+)
+
+```
+
+Get price index, M/P, set interestRate  
+
+```{r attachISLM}
+
+pIndex = ISLMdata$CPI/ISLMdata$CPI[1] # normalize CPI
+
+# constant $ money supply Gross $$ divided by P
+MoverP = ISLMdata$M1/pIndex 
+
+ISLMdata$'MoverP'= MoverP
+
+interestRate = ISLMdata$libor
+
+attach(ISLMdata)
+
+```
+
+## Equations:  
+   descriptions: Economic goals  
+   Full Employment GDP is estimated to be $21700B
+   interest rate aroud 1%
+   
+### IS - investment saving..  
+  Y = C + I + G - Nx   macro economic description  
+      C = C0 + b $\times$ Taxes    
+      I = I0 + dY $\times$ Y + dInt $\times$ interest  
+      G, Nx are exogenous  
+
+
+###  LM - liquidity preference for money
+  M/P = M0 + m1 $\times$ Y + m2 $\times$ interest     
+
+### IS curve: 
+ Y = (C0 + b $\times$ (Y-Tax) + I0 + dY $\times$ Y +dInt $\times$ interest + G - Nx )  
+ write two IS functions:  
+ IS_Y, solve for y in the IS equation  
+ IS_i, solve for interest in the IS equation  
+
+### LM curve:  
+ write two LM functions:    
+ LM_Y, solve for Y in the M/P equation  
+ LM_i, solve for i in the M/P equation  
+
+## Quesions:
+For this exercise assume Full Employment GDP is $21700B, and Nx = -500
+
+ 1. Given the last values of the variables, (estimates of current US       macroeconomic values)
+ 
+   a.  What is the equilibrium level of GDP predicted by IS_Y?
+ 
+   b.  If these are difference from the present levels, for example if predicted GDP exceeds full employment GDP or interest rate is negative,  
+what does this model suggest about the US economy?
+
+ 2. Policy- the COVID19 virus will likely reduce GDP  by 1 or 2 % and
+    change Nx by about 5%-10% (we import less).  Given this,
+    What policy measures does the IS-LM model suggest as a way to
+    maintain GDP?    
+
+##  FUNCTIONS -------------------------------------------------- 
+
+## consumption function  
+ consumption is a function of disposable income, (Y - tax) 
+
+```{r}
+disposableY = Y-Taxes
+consumpFcn=glm(Consum ~ disposableY) # Y-Taxes is disposable income
+summary(consumpFcn)
+#get the coefficients for later use
+C0 = as.numeric(consumpFcn$coefficients[1])
+b = as.numeric(consumpFcn$coefficients[2])
+
+consumption=function(Y, Taxes, C0, b){
+  disposableY = Y-Taxes
+  return(C0+b*disposableY)
+}
+
+plot(Y, consumption(Y, Taxes, C0, b), ylab='Consumption', type  = 'l',main='FRED data 2017-2019')
+points(Y,Consum, pch='x')
+grid()
+```
+
+## investment function
+```{r}
+
+investFcn = glm(Invest ~ Y + interestRate)
+summary(investFcn)
+I0 = as.numeric(investFcn$coefficients[1])
+dY = as.numeric(investFcn$coefficients[2])
+dInt = as.numeric(investFcn$coefficients[3])
+
+investment = function(Y, interestRate){
+  return(I0 + dY*Y +dInt*interestRate)
+}
+
+plot(Y, investment(Y, interestRate), type='l',main='FRED data 2017-2019', ylab = 'Investment')
+points(Y,Invest, pch='x')
+grid()
+```
+
+## demand for money function
+```{r}
+moneyFcn = glm(MoverP ~ Y + interestRate)
+summary(moneyFcn)
+M0 = moneyFcn$coefficients[1]
+m1 = moneyFcn$coefficients[2]
+m2 = moneyFcn$coefficients[3]
+
+demandM = function(Y, Int_R, M0, m1, m2){
+  return( M0 + m1*Y + m2*Int_R)
+}
+
+plot(Y, demandM(Y, interestRate, M0, m1, m2), type='l', ylab = 'demand for $', main='FRED data 2017-2019')
+points(Y, MoverP, pch='x')
+grid()
+
+```
+  
+## IS -
+Innvestment/saving  formula from in class
+
+Y from IS equation
+```{r}
+
+IS_Y = function(C0, b, I0, dY, dInt, intRate, tax, G, Nx){
+  # C0, b:  coefficients from consumption function
+  # I0, dY, dInt: coefficients from investment function
+  # intRate:  interest rate
+  # Tax, G, Nx: government spending, net exports, exogenous
+  Y = (C0-b*tax  + I0 + dInt*intRate + G - Nx)/(1-dY-b)
+  return(Y)
+}
+
+```
+
+```{r}
+
+IS_i = function(Y, C, I0, dY, dInt, G, Nx){
+  intR = (Y -C -I0 -dY*Y-G +Nx)/dInt
+  return(intR)
+}
+```
+
+
+## LM
+interest from LM
+
+```{r}
+
+LM_i = function(MoverP,Y, M0, m1, m2){
+  intR = (MoverP - M0 - m1*Y)/m2
+  return(as.numeric(intR))
+}
+```
+
+
+GDP from LM
+```{r}
+LM_Y = function(MoverP,intR, M0, m1, m2){
+  Y = (MoverP-m2*intR)/m1
+  return(Y)
+}
+```
+
+### 1. find values of Tax and g_sPend the result in interestRate  around 1% Using IS
+
+```{r targets}
+
+#Macro economic targets these are fixed----
+Y_FE = 21700 #Full Employment GDP
+netX =-450
+intR = 1.0
+#------------------------------------------
+
+#Fiscal policy--  YOU adjust these
+Tax = 2000
+g_Spend = 7500
+
+#Monetary policy--  YOU set this
+mOp = 3950 # money supply
+
+#-------------------------------------------------------
+
+C = consumption(Y_FE, Tax, C0, b)
+print(paste('consumption: ',C))
+
+I = investment(Y_FE, intR)
+print(paste('investment: ',I))
+
+equilibIntRate=LM_i(mOp,Y, M0, m1, m2)
+plot(Y,equilibIntRate, ylab = 'LM interest', type='l',main='FRED data 2017-2019')
+grid()
+
+
+equilibriumY = IS_Y( C0, b, I0, dY, dInt, equilibIntRate, Tax, g_Spend, netX)
+plot(Y, equilibriumY, type='l',main='FRED data 2017-2019')
+grid()
+
+GDP = C + I + g_Spend - netX
+print(paste('national income accounting GDP: $', round(GDP)))
+```
+
+### 2. using interest rate from IS above, find mOp to match intR.  Keep GDP around $21700B
+
+```{r}
+# Monetary policy set money supply
+
+LM_i(mOp,Y_FE, M0, m1, m2)
+```
+
+Write up your results; given the likely effects of COVOD19, what Econ
+policy recommendations are made by the IS-LM model?
+
+Include your recommendations for:
+1. Federal taxes- tax cut, increase federal taxes, of leave at curreint level?  What is the dollar amound of taxes that best serves to make predicted GDP around $21700B
+2. Money supply: what level makes the most sense to maintain interest around 1%?
+3. Government spending: should government spending be increased, decreased or left at current levels?   What dollar amount do you recommend for government spending
+
+Do your recommedations seem reasonable, given this is an election year?
+
+## Conclusions:
+<!-- write up conclusions here -->
+
